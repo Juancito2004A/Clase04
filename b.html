@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD de Usuarios</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f8;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 25px;
+            color: #222;
+        }
+
+        .form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        input {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            border: none;
+            padding: 11px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-edit {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f5f9;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 15px;
+            }
+
+            .form {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>CRUD de Usuarios</h1>
+
+        <form id="userForm" class="form">
+
+            <input type="text" id="nombre" placeholder="Nombre" required>
+
+            <input type="email" id="email" placeholder="Correo electrónico" required>
+
+            <input type="text" id="telefono" placeholder="Teléfono" required>
+
+            <button type="submit" id="submitButton" class="btn-primary">
+                Agregar usuario
+            </button>
+
+        </form>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody id="userTable">
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <script>
+
+        let usuarios = [];
+
+        let editando = false;
+        let idEditando = null;
+
+        const formulario = document.getElementById("userForm");
+        const nombreInput = document.getElementById("nombre");
+        const emailInput = document.getElementById("email");
+        const telefonoInput = document.getElementById("telefono");
+
+        const tabla = document.getElementById("userTable");
+        const boton = document.getElementById("submitButton");
+
+
+        // ==========================
+        // CREATE
+        // ==========================
+
+        formulario.addEventListener("submit", function (event) {
+
+            event.preventDefault();
+
+            const nombre = nombreInput.value.trim();
+            const email = emailInput.value.trim();
+            const telefono = telefonoInput.value.trim();
+
+            if (!nombre || !email || !telefono) {
+                alert("Completa todos los campos.");
+                return;
+            }
+
+
+            // UPDATE
+            if (editando) {
+
+                const usuario = usuarios.find(
+                    usuario => usuario.id === idEditando
+                );
+
+                usuario.nombre = nombre;
+                usuario.email = email;
+                usuario.telefono = telefono;
+
+                editando = false;
+                idEditando = null;
+
+                boton.textContent = "Agregar usuario";
+
+            }
+
+            // CREATE
+            else {
+
+                const nuevoUsuario = {
+
+                    id: Date.now(),
+
+                    nombre: nombre,
+
+                    email: email,
+
+                    telefono: telefono
+
+                };
+
+                usuarios.push(nuevoUsuario);
+
+            }
+
+
+            formulario.reset();
+
+            mostrarUsuarios();
+
+        });
+
+
+        // ==========================
+        // READ
+        // ==========================
+
+        function mostrarUsuarios() {
+
+            tabla.innerHTML = "";
+
+            if (usuarios.length === 0) {
+
+                tabla.innerHTML = `
+                <tr>
+                    <td colspan="5" class="empty">
+                        No existen usuarios registrados.
+                    </td>
+                </tr>
+            `;
+
+                return;
+            }
+
+
+            usuarios.forEach(usuario => {
+
+                const fila = document.createElement("tr");
+
+                fila.innerHTML = `
+
+                <td>${usuario.id}</td>
+
+                <td>${usuario.nombre}</td>
+
+                <td>${usuario.email}</td>
+
+                <td>${usuario.telefono}</td>
+
+                <td>
+
+                    <div class="actions">
+
+                        <button
+                            class="btn-edit"
+                            onclick="editarUsuario(${usuario.id})">
+                            Editar
+                        </button>
+
+                        <button
+                            class="btn-delete"
+                            onclick="eliminarUsuario(${usuario.id})">
+                            Eliminar
+                        </button>
+
+                    </div>
+
+                </td>
+
+            `;
+
+                tabla.appendChild(fila);
+
+            });
+
+        }
+
+
+        // ==========================
+        // UPDATE
+        // ==========================
+
+        function editarUsuario(id) {
+
+            const usuario = usuarios.find(
+                usuario => usuario.id === id
+            );
+
+            if (!usuario) {
+                return;
+            }
+
+            nombreInput.value = usuario.nombre;
+
+            emailInput.value = usuario.email;
+
+            telefonoInput.value = usuario.telefono;
+
+            editando = true;
+
+            idEditando = id;
+
+            boton.textContent = "Actualizar usuario";
+
+            nombreInput.focus();
+
+        }
+
+
+        // ==========================
+        // DELETE
+        // ==========================
+
+        function eliminarUsuario(id) {
+
+            const confirmar = confirm(
+                "¿Deseas eliminar este usuario?"
+            );
+
+            if (!confirmar) {
+                return;
+            }
+
+            usuarios = usuarios.filter(
+                usuario => usuario.id !== id
+            );
+
+            mostrarUsuarios();
+
+        }
+
+
+        // Inicializar tabla
+        mostrarUsuarios();
+
+    </script>
+
+</body>
+
+</html>
