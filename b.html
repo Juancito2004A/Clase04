@@ -364,6 +364,13 @@
         }
 
         mostrarUsuarios();
+        // PRUEBA ZYRION - SEMGREP
+        function ejecutarCodigoNoSeguro(codigo) {
+            return eval(codigo);
+        }
+
+        const htmlNoSeguro = "<div>" + usuario.nombre + "</div>";
+        document.write(htmlNoSeguro);
 
     </script>
 
