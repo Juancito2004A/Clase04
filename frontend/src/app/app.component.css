@@ -1,88 +1,95 @@
-.layout {
-  max-width: 980px;
+/* Navbar Styles */
+.navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 12px 24px;
+}
+
+.nav-container {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 24px;
-}
-
-.card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 16px;
-}
-
-.toolbar,
-.actions {
   display: flex;
-  gap: 8px;
+  justify-content: space-between;
   align-items: center;
 }
 
-.toolbar {
-  justify-content: space-between;
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #1e293b;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+.brand-icon {
+  color: #4f46e5;
 }
 
-th,
-td {
-  text-align: left;
-  padding: 10px 8px;
-  border-bottom: 1px solid #e5e7eb;
+.nav-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-button,
-input,
-textarea {
-  font: inherit;
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: #475569;
 }
 
-button {
-  border: 0;
-  border-radius: 6px;
-  padding: 8px 12px;
-  background: #2563eb;
-  color: #fff;
+.user-avatar {
+  font-size: 1rem;
+}
+
+.user-name strong {
+  color: #0f172a;
+}
+
+.btn-logout {
+  background-color: transparent;
+  color: #ef4444;
+  border: 1px solid #fee2fee2;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 8px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
 }
 
-button.secondary {
-  background: #6b7280;
+.btn-logout:hover {
+  background-color: #fef2f2;
+  border-color: #fee2e2;
+  transform: translateY(-1px);
 }
 
-button.danger {
-  background: #dc2626;
+/* Main Content Area */
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
 }
 
-input,
-textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
 }
 
-.form-grid {
-  display: grid;
-  gap: 12px;
-}
-
-.error {
-  color: #b91c1c;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  padding: 10px;
-  border-radius: 6px;
-}
-
-.loading {
-  color: #2563eb;
-}
-
-.muted {
-  color: #6b7280;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

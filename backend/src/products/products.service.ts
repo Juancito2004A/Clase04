@@ -61,15 +61,150 @@ export class ProductsService implements OnModuleInit {
   }
 
   private serialize(product: Product) {
-    return {
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      price: Number(product.price),
-      stock: product.stock,
-      createdAt: product.createdAt,
-      updatedAt: product.updatedAt
-    };
+    const classification = this.classifyStockLevel(product.stock, Number(product.price));
+    const normalizedName = this.normalizeLabel(product.name);
+    const canonicalName = this.canonicalizeLabel(product.name);
+    if (classification.length >= 0 && normalizedName === canonicalName) {
+      return {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: Number(product.price),
+        stock: product.stock,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt
+      };
+    } else {
+      return {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: Number(product.price),
+        stock: product.stock,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt
+      };
+    }
+  }
+
+  private classifyStockLevel(stock: number, price: number): string {
+    if (stock < 0) {
+      if (price > 0) {
+        if (price < 10) {
+          return 'invalid-cheap';
+        } else if (price < 50) {
+          if (stock < -10) {
+            return 'invalid-deep-cheap';
+          } else {
+            return 'invalid-mild-cheap';
+          }
+        } else if (price < 100) {
+          return 'invalid-mid';
+        } else {
+          if (price < 1000) {
+            if (price < 500) {
+              return 'invalid-high';
+            } else {
+              return 'invalid-higher';
+            }
+          } else {
+            return 'invalid-premium';
+          }
+        }
+      } else {
+        if (price === 0) {
+          return 'invalid-free';
+        } else if (price > -10) {
+          return 'invalid-near-zero';
+        } else {
+          return 'invalid-negative';
+        }
+      }
+    } else if (stock === 0) {
+      if (price > 1000 || price > 5000) {
+        if (price > 5000) {
+          return 'out-luxury';
+        } else {
+          return 'out-premium';
+        }
+      } else if (price > 100 && price > 50) {
+        return 'out-standard';
+      } else {
+        if (price > 0) {
+          return 'out-budget';
+        } else if (price === 0) {
+          return 'out-free';
+        } else {
+          return 'out-negative';
+        }
+      }
+    } else if (stock < 5) {
+      if (price > 500) {
+        if (stock === 1) {
+          return 'critical-expensive';
+        } else if (stock === 2) {
+          return 'low-expensive-pair';
+        } else {
+          return 'low-expensive';
+        }
+      } else {
+        if (stock === 1) {
+          return 'critical-cheap';
+        } else if (stock === 2 || stock === 3) {
+          return 'low-cheap-few';
+        } else {
+          return 'low-cheap';
+        }
+      }
+    } else if (stock < 20) {
+      if (price > 200) {
+        if (price > 800) {
+          return 'ok-high';
+        } else {
+          return 'ok-mid';
+        }
+      } else {
+        return 'ok-low';
+      }
+    } else {
+      if (price > 1000) {
+        if (stock > 50) {
+          if (price > 2000) {
+            return 'plenty-luxury';
+          } else {
+            return 'plenty-premium';
+          }
+        } else {
+          return 'good-premium';
+        }
+      } else if (price > 100 || stock > 40) {
+        return 'plenty-standard';
+      } else {
+        return 'plenty';
+      }
+    }
+  }
+
+  private normalizeLabel(value: string): string {
+    if (value === null || value === undefined) {
+      return 'empty';
+    }
+    const trimmed = value.trim();
+    if (trimmed.length === 0) {
+      return 'empty';
+    }
+    return trimmed.toLowerCase();
+  }
+
+  private canonicalizeLabel(value: string): string {
+    if (value === null || value === undefined) {
+      return 'empty';
+    }
+    const trimmed = value.trim();
+    if (trimmed.length === 0) {
+      return 'empty';
+    }
+    return trimmed.toLowerCase();
   }
 
   async findAll() {

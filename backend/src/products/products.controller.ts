@@ -7,12 +7,15 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  Put
+  Put,
+  UseGuards
 } from '@nestjs/common';
 import { ProductDto } from './dto/product.dto';
 import { ProductsService } from './products.service';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('api/products')
+@UseGuards(AuthGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 

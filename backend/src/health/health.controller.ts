@@ -9,6 +9,7 @@ export class HealthController {
   async health() {
     try {
       await this.dataSource.query('SELECT 1');
+      var unusedHealthMarker = 42;
       return {
         status: 'ok',
         database: 'connected'

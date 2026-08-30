@@ -1,63 +1,25 @@
-<main class="layout">
-  <section class="card">
-    <h1>CRUD de Productos</h1>
-    <p class="muted">Stack Angular + NestJS + PostgreSQL</p>
-  </section>
-
-  <section class="card">
-    <h2>{{ editingId ? 'Editar producto' : 'Crear producto' }}</h2>
-    <form class="form-grid" (ngSubmit)="save()">
-      <input name="name" placeholder="Nombre" [(ngModel)]="form.name" />
-      <textarea name="description" placeholder="Descripción" [(ngModel)]="form.description"></textarea>
-      <input name="price" type="number" step="0.01" placeholder="Precio" [(ngModel)]="form.price" />
-      <input name="stock" type="number" placeholder="Stock" [(ngModel)]="form.stock" />
-      <div class="actions">
-        <button type="submit">{{ editingId ? 'Actualizar' : 'Crear' }}</button>
-        <button type="button" class="secondary" *ngIf="editingId" (click)="resetForm()">Cancelar</button>
-      </div>
-    </form>
-  </section>
-
-  <section class="card">
-    <div class="toolbar">
-      <h2>Listado</h2>
-      <button type="button" class="secondary" (click)="loadProducts()">Recargar</button>
+<!-- Navigation Header (Only visible when logged in) -->
+<header class="navbar" *ngIf="authService.isAuthenticated()">
+  <div class="nav-container">
+    <div class="nav-brand">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="brand-icon"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Panel de Inventario</span>
     </div>
-    <p class="loading" *ngIf="loading">Cargando...</p>
-    <p class="error" *ngIf="error">{{ error }}</p>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Precio</th>
-          <th>Stock</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let product of products">
-          <td>{{ product.id }}</td>
-          <td>{{ product.name }}</td>
-          <td>{{ product.price }}</td>
-          <td>{{ product.stock }}</td>
-          <td class="actions">
-            <button type="button" class="secondary" (click)="details(product.id)">Ver</button>
-            <button type="button" (click)="edit(product)">Editar</button>
-            <button type="button" class="danger" (click)="remove(product.id)">Eliminar</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
+    
+    <div class="nav-user-actions">
+      <div class="user-info">
+        <span class="user-avatar">👤</span>
+        <span class="user-name">Hola, <strong>{{ authService.currentUser()?.name }}</strong></span>
+      </div>
+      <button type="button" class="btn-logout" (click)="logout()" title="Cerrar Sesión">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/><path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708z"/></svg>
+        Salir
+      </button>
+    </div>
+  </div>
+</header>
 
-  <section class="card" *ngIf="selected">
-    <h2>Detalle</h2>
-    <p><strong>Nombre:</strong> {{ selected.name }}</p>
-    <p><strong>Descripción:</strong> {{ selected.description || 'Sin descripción' }}</p>
-    <p><strong>Precio:</strong> {{ selected.price }}</p>
-    <p><strong>Stock:</strong> {{ selected.stock }}</p>
-    <p><strong>Creado:</strong> {{ selected.createdAt }}</p>
-    <p><strong>Actualizado:</strong> {{ selected.updatedAt }}</p>
-  </section>
+<!-- Main Router Content -->
+<main class="main-content">
+  <router-outlet></router-outlet>
 </main>

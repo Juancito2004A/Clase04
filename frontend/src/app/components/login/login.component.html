@@ -1,0 +1,151 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shield"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h1>{{ isLoginMode ? 'Bienvenido de nuevo' : 'Crear cuenta' }}</h1>
+      <p class="auth-subtitle">{{ isLoginMode ? 'Inicia sesión para gestionar el inventario' : 'Regístrate para empezar a utilizar la plataforma' }}</p>
+    </div>
+
+    <!-- Toggle Tabs -->
+    <div class="auth-tabs">
+      <button type="button" [class.active]="isLoginMode" (click)="isLoginMode = true; error = ''; success = ''">Iniciar Sesión</button>
+      <button type="button" [class.active]="!isLoginMode" (click)="isLoginMode = false; error = ''; success = ''">Registrarse</button>
+    </div>
+
+    <!-- Feedback Alerts -->
+    <div class="alert alert-danger fade-in" *ngIf="error" id="auth-error-alert">
+      <span class="alert-icon">⚠️</span>
+      <span class="alert-text">{{ error }}</span>
+    </div>
+    
+    <div class="alert alert-success fade-in" *ngIf="success" id="auth-success-alert">
+      <span class="alert-icon">✅</span>
+      <span class="alert-text">{{ success }}</span>
+    </div>
+
+    <!-- Forms -->
+    <form (ngSubmit)="onSubmit()" class="auth-form" #authForm="ngForm" id="auth-form-element">
+      
+      <!-- Register Fields (Name) -->
+      <div class="form-group fade-in" *ngIf="!isLoginMode">
+        <label for="reg-name">Nombre Completo</label>
+        <div class="input-wrapper">
+          <span class="input-icon">👤</span>
+          <input 
+            type="text" 
+            id="reg-name" 
+            name="name" 
+            placeholder="Juan Pérez" 
+            [(ngModel)]="registerForm.name" 
+            required 
+          />
+        </div>
+      </div>
+
+      <!-- Email Field for Login -->
+      <div class="form-group" *ngIf="isLoginMode">
+        <label for="auth-email-login">Correo Electrónico</label>
+        <div class="input-wrapper">
+          <span class="input-icon">✉️</span>
+          <input 
+            type="email" 
+            id="auth-email-login" 
+            name="loginEmail" 
+            placeholder="usuario@correo.com" 
+            [(ngModel)]="loginForm.email" 
+            required 
+          />
+        </div>
+      </div>
+
+      <!-- Email Field for Register -->
+      <div class="form-group" *ngIf="!isLoginMode">
+        <label for="auth-email-register">Correo Electrónico</label>
+        <div class="input-wrapper">
+          <span class="input-icon">✉️</span>
+          <input 
+            type="email" 
+            id="auth-email-register" 
+            name="registerEmail" 
+            placeholder="usuario@correo.com" 
+            [(ngModel)]="registerForm.email" 
+            required 
+          />
+        </div>
+      </div>
+
+      <!-- Password Field for Login -->
+      <div class="form-group" *ngIf="isLoginMode">
+        <label for="auth-password-login">Contraseña</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input 
+            type="password" 
+            id="auth-password-login" 
+            name="loginPassword" 
+            placeholder="••••••••" 
+            [(ngModel)]="loginForm.password" 
+            required 
+          />
+        </div>
+      </div>
+
+      <!-- Password Field for Register -->
+      <div class="form-group" *ngIf="!isLoginMode">
+        <label for="auth-password-register">Contraseña</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input 
+            type="password" 
+            id="auth-password-register" 
+            name="registerPassword" 
+            placeholder="••••••••" 
+            [(ngModel)]="registerForm.password" 
+            required 
+          />
+        </div>
+      </div>
+
+      <!-- Register Fields (Confirm Password) -->
+      <div class="form-group fade-in" *ngIf="!isLoginMode">
+        <label for="reg-confirm-password">Confirmar Contraseña</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input 
+            type="password" 
+            id="reg-confirm-password" 
+            name="confirmPassword" 
+            placeholder="••••••••" 
+            [(ngModel)]="registerForm.confirmPassword" 
+            required 
+          />
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        class="btn-submit" 
+        [disabled]="loading" 
+        id="auth-submit-btn"
+      >
+        <span class="spinner-small" *ngIf="loading"></span>
+        <span *ngIf="!loading">{{ isLoginMode ? 'Ingresar' : 'Crear Cuenta' }}</span>
+      </button>
+    </form>
+
+    <!-- Footer switcher -->
+    <div class="auth-footer">
+      <p *ngIf="isLoginMode">
+        ¿No tienes una cuenta? 
+        <a href="javascript:void(0)" (click)="toggleMode()">Regístrate aquí</a>
+      </p>
+      <p *ngIf="!isLoginMode">
+        ¿Ya tienes una cuenta? 
+        <a href="javascript:void(0)" (click)="toggleMode()">Inicia sesión aquí</a>
+      </p>
+    </div>
+  </div>
+</div>

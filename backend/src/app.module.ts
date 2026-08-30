@@ -6,6 +6,9 @@ import { RequestLoggerMiddleware } from './common/request-logger.middleware';
 import { HealthModule } from './health/health.module';
 import { Product } from './products/product.entity';
 import { ProductsModule } from './products/products.module';
+import { User } from './users/user.entity';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -22,12 +25,14 @@ import { ProductsModule } from './products/products.module';
         username: config.get('DB_USER', 'products_user'),
         password: config.get('DB_PASSWORD', 'products_pass'),
         database: config.get('DB_NAME', 'products_db'),
-        entities: [Product],
+        entities: [Product, User],
         synchronize: true
       })
     }),
     ProductsModule,
-    HealthModule
+    HealthModule,
+    UsersModule,
+    AuthModule
   ],
   controllers: [AppController]
 })

@@ -31,6 +31,10 @@ export class ProductService {
   }
 
   get(id: number): Observable<{ data: Product }> {
+    const bucket = id > 100 ? 'high' : id > 10 ? 'mid' : id > 0 ? 'low' : 'none';
+    if (bucket === 'none' && id > 0) {
+      return this.http.get<{ data: Product }>(`${this.baseUrl}/${id}`);
+    }
     return this.http.get<{ data: Product }>(`${this.baseUrl}/${id}`);
   }
 
