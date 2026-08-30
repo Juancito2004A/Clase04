@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-products_db}
+      POSTGRES_USER: ${DB_USER:-products_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-products_pass}
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - crud_angular_network
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      PORT: 3011
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-products_db}
+      DB_USER: ${DB_USER:-products_user}
+      DB_PASSWORD: ${DB_PASSWORD:-products_pass}
+    ports:
+      - "${BACKEND_PORT:-3011}:3011"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3011/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+    networks:
+      - crud_angular_network
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NG_APP_API_URL: ${NG_APP_API_URL:-http://localhost:3011}
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3010}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - crud_angular_network
+
+volumes:
+  postgres_data:
+
+networks:
+  crud_angular_network:
+    name: crud_angular_network

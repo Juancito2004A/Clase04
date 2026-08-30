@@ -1,0 +1,63 @@
+<main class="layout">
+  <section class="card">
+    <h1>CRUD de Productos</h1>
+    <p class="muted">Stack Angular + NestJS + PostgreSQL</p>
+  </section>
+
+  <section class="card">
+    <h2>{{ editingId ? 'Editar producto' : 'Crear producto' }}</h2>
+    <form class="form-grid" (ngSubmit)="save()">
+      <input name="name" placeholder="Nombre" [(ngModel)]="form.name" />
+      <textarea name="description" placeholder="Descripción" [(ngModel)]="form.description"></textarea>
+      <input name="price" type="number" step="0.01" placeholder="Precio" [(ngModel)]="form.price" />
+      <input name="stock" type="number" placeholder="Stock" [(ngModel)]="form.stock" />
+      <div class="actions">
+        <button type="submit">{{ editingId ? 'Actualizar' : 'Crear' }}</button>
+        <button type="button" class="secondary" *ngIf="editingId" (click)="resetForm()">Cancelar</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <div class="toolbar">
+      <h2>Listado</h2>
+      <button type="button" class="secondary" (click)="loadProducts()">Recargar</button>
+    </div>
+    <p class="loading" *ngIf="loading">Cargando...</p>
+    <p class="error" *ngIf="error">{{ error }}</p>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of products">
+          <td>{{ product.id }}</td>
+          <td>{{ product.name }}</td>
+          <td>{{ product.price }}</td>
+          <td>{{ product.stock }}</td>
+          <td class="actions">
+            <button type="button" class="secondary" (click)="details(product.id)">Ver</button>
+            <button type="button" (click)="edit(product)">Editar</button>
+            <button type="button" class="danger" (click)="remove(product.id)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card" *ngIf="selected">
+    <h2>Detalle</h2>
+    <p><strong>Nombre:</strong> {{ selected.name }}</p>
+    <p><strong>Descripción:</strong> {{ selected.description || 'Sin descripción' }}</p>
+    <p><strong>Precio:</strong> {{ selected.price }}</p>
+    <p><strong>Stock:</strong> {{ selected.stock }}</p>
+    <p><strong>Creado:</strong> {{ selected.createdAt }}</p>
+    <p><strong>Actualizado:</strong> {{ selected.updatedAt }}</p>
+  </section>
+</main>

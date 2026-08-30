@@ -1,0 +1,11 @@
+name: crud-angular-nest
+language: typescript
+frontend: angular
+backend: nestjs
+database: postgresql
+packageManager: npm
+buildCommand: npm run build
+startCommand: npm start
+testCommand: npm test
+healthEndpoint: /health
+port: 3011
