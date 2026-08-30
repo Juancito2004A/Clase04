@@ -89,3 +89,37 @@ npm test
 ```
 
 Los problemas de calidad **no deben corregirse** después del análisis: son el oráculo de la prueba.
+
+## Contenido web adicional (login, reportes, perfil)
+
+Se ampliaron pantallas reales del sistema para que Semgrep (seguridad) y SonarQube (calidad) tengan más superficie. El CRUD de productos no se reemplazó.
+
+### Nuevas rutas
+
+- `/login` — panel de cuenta demo + malas prácticas de auth
+- `/reports` — KPIs de inventario + búsqueda
+- `/profile` — sesión, token y códigos de recuperación
+- `GET /api/reports/summary`
+- `GET /api/reports/search?q=`
+- `GET /api/auth/me`
+
+### Seguridad esperada (Semgrep)
+
+| # | Archivo | Problema |
+|---|---|---|
+| 1 | `frontend/.../login.component.ts` | Contraseña e API keys hardcodeadas; password en `localStorage`; `innerHTML`; `document.write`; `eval` |
+| 2 | `backend/src/auth/auth.service.ts` | Backdoor `admin@clase04.local` / `Clase04Admin!`; hash MD5; secret en el JWT |
+| 3 | `backend/src/users/users.service.ts` | SQL concatenado; `NODE_TLS_REJECT_UNAUTHORIZED = '0'` |
+| 4 | `backend/src/reports/reports.service.ts` | `LIKE '%" + term + "%'` (SQL injection) |
+| 5 | `frontend/.../profile.component.ts` | Token y última contraseña visibles en pantalla |
+
+Las credenciales demo son falsas y solo sirven para esta prueba.
+
+### Calidad extra esperada (Sonar)
+
+| Archivo | Problema | Regla esperada |
+|---|---|---|
+| `login.component.ts` `buildSupportHint` | Ternario anidado + booleanos redundantes | S3358, S1125 |
+| `reports.service.ts` | `var` no usado, ramas idénticas, métodos duplicados | S3504, S1481, S3923, S4144 |
+| `reports.component.ts` | `if` colapsables, ternario anidado, `if/else` booleano | S1066, S3358, S1126 |
+| `profile.component.ts` | Métodos idénticos, ternario anidado, `if` colapsables | S4144, S3358, S1066 |

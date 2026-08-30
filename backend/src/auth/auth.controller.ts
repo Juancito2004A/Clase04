@@ -1,5 +1,6 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { AuthGuard } from './auth.guard';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
 
 export class RegisterDto {
@@ -40,5 +41,11 @@ export class AuthController {
   async login(@Body() payload: LoginDto) {
     const data = await this.authService.login(payload.email, payload.password);
     return { data };
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard)
+  async me(@Req() request: any) {
+    return { data: request.user };
   }
 }

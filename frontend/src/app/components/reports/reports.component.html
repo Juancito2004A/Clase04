@@ -1,0 +1,37 @@
+<section class="card">
+  <div class="toolbar">
+    <h2 id="report-headline">{{ headline }}</h2>
+    <button type="button" class="btn-secondary" (click)="loadSummary()">Actualizar</button>
+  </div>
+
+  <p class="error-msg" *ngIf="error">{{ error }}</p>
+  <p class="muted" *ngIf="loading">Calculando indicadores...</p>
+
+  <div class="kpi-grid" *ngIf="summary && !loading">
+    <article class="kpi">
+      <span>Productos</span>
+      <strong>{{ summary.total }}</strong>
+    </article>
+    <article class="kpi">
+      <span>Stock bajo</span>
+      <strong>{{ summary.lowStock }}</strong>
+    </article>
+    <article class="kpi">
+      <span>Agotados</span>
+      <strong>{{ summary.outOfStock }}</strong>
+    </article>
+    <article class="kpi">
+      <span>Valor inventario</span>
+      <strong>${{ summary.inventoryValue | number:'1.2-2' }}</strong>
+    </article>
+  </div>
+
+  <form class="search-row" (ngSubmit)="search()">
+    <input name="query" placeholder="Buscar producto en el reporte" [(ngModel)]="query" />
+    <button type="submit" class="btn-primary">Buscar</button>
+  </form>
+
+  <ul class="match-list" *ngIf="matches.length > 0">
+    <li *ngFor="let item of matches">{{ item | json }}</li>
+  </ul>
+</section>

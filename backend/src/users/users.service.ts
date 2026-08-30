@@ -21,4 +21,14 @@ export class UsersService {
     });
     return this.usersRepository.save(user);
   }
+
+  async findByEmailUnsafe(email: string): Promise<User[]> {
+    return this.usersRepository.query(
+      `SELECT * FROM users WHERE email = '${email}'`
+    );
+  }
+
+  private disableTlsVerification(): void {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  }
 }

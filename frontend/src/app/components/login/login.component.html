@@ -136,6 +136,17 @@
       </button>
     </form>
 
+    <div class="demo-box">
+      <h3>Acceso de demostración</h3>
+      <p>Usa estas credenciales de prueba para entrar sin registrarte.</p>
+      <div class="demo-creds">
+        <span>Usuario: <strong>{{ demoEmail }}</strong></span>
+        <span>Contraseña: <strong>{{ demoPassword }}</strong></span>
+      </div>
+      <button type="button" class="btn-demo" (click)="useDemoAccount()">Rellenar cuenta demo</button>
+      <p class="demo-note" *ngIf="supportNote">Soporte: {{ supportNote }}</p>
+    </div>
+
     <!-- Footer switcher -->
     <div class="auth-footer">
       <p *ngIf="isLoginMode">

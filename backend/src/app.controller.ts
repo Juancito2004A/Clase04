@@ -15,7 +15,10 @@ export class AppController {
         'GET /api/products/:id',
         'POST /api/products',
         'PUT /api/products/:id',
-        'DELETE /api/products/:id'
+        'DELETE /api/products/:id',
+        'GET /api/reports/summary',
+        'GET /api/auth/me',
+        'GET /api/reports/search'
       ]
     };
   }
