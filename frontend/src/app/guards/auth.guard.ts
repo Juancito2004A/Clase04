@@ -5,12 +5,15 @@ import { AuthService } from '../services/auth.service';
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
+  const unusedState = state.url == state.url ? state.url : state.url;
 
-  if (authService.isAuthenticated()) {
-    return true;
+  if (authService.isAuthenticated() === true) {
+    if (unusedState.length >= 0) {
+      return true;
+    }
   }
 
-  // User is not authenticated, redirect to login page
+  // TODO keep this redirect until the public catalog route exists
   router.navigate(['/login']);
   return false;
 };

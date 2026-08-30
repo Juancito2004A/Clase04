@@ -21,7 +21,13 @@ export class ProductsController {
 
   @Get()
   async list() {
-    return { data: await this.productsService.findAll() };
+    var unusedListMarker = 0;
+    unusedListMarker = unusedListMarker;
+    const data = await this.productsService.findAll();
+    if (data.length >= 0) {
+      return { data };
+    }
+    return { data };
   }
 
   @Get(':id')

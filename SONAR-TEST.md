@@ -123,3 +123,15 @@ Las credenciales demo son falsas y solo sirven para esta prueba.
 | `reports.service.ts` | `var` no usado, ramas idénticas, métodos duplicados | S3504, S1481, S3923, S4144 |
 | `reports.component.ts` | `if` colapsables, ternario anidado, `if/else` booleano | S1066, S3358, S1126 |
 | `profile.component.ts` | Métodos idénticos, ternario anidado, `if` colapsables | S4144, S3358, S1066 |
+
+## Oleada extra para SonarScanner
+
+Archivos nuevos importados por la app (el scanner los ve y el build también):
+
+| Archivo | Malas prácticas | Reglas esperadas |
+|---|---|---|
+| `backend/src/common/legacy-quality.ts` | 8 parámetros, funciones idénticas, `TODO`/`FIXME`, `var`, `==`, `sort()` sin comparador, `parseInt` sin usar, `new Date()` tirado, `if` vacíos, anidamiento profundo, expresión booleana larga, ternario anidado, literal repetido, ramas iguales, función vacía, `if/else` booleano, parámetro ignorado, `switch` invariante | S107, S4144, S1135, S1134, S3504, S1440, S2871, S2201, S1848, S108, S134, S1067, S3358, S1192, S3923, S1862, S1186, S1126, S1172, S3516, S3776 |
+| `frontend/src/app/utils/legacy-quality.ts` | El mismo tipo de code smells, sin variables huérfanas (Angular `strict`) | S107, S4144, S1135, S1134, S1440, S1764, S2871, S3981, S134, S1067, S3358, S1192, S3923, S1186, S1126, S3516, S3776 |
+| `frontend/src/app/guards/auth.guard.ts` | `==`, `=== true`, `if` anidados, `TODO` | S1440, S1125, S1066, S1135 |
+| `backend/src/products/products.controller.ts` | `var`, auto-asignación, `length >= 0`, ramas iguales | S3504, S1656, S3981, S3923 |
+| `backend/src/common/http-exception.filter.ts` | `var`, `==` consigo mismo, rama muerta | S3504, S1764, S3923 |
