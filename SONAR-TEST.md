@@ -2,6 +2,7 @@
 
 Este documento describe problemas de **calidad / mantenibilidad** introducidos deliberadamente en el proyecto **Clase04** (Angular + NestJS) para validar el flujo:
 
+
 Repositorio → Zyrion → engine-sonar → SonarQube
   → issueCount > 0
   → Zyrion recibe los issues
