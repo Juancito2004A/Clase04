@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -16,12 +17,6 @@ export class LoginComponent {
   loading = false;
   error = '';
   success = '';
-  supportNote = '';
-
-  readonly demoEmail = 'admin@clase04.local';
-  readonly demoPassword = 'Clase04Admin!';
-  readonly supportApiKey = '';
-  readonly awsAccessKey = 'AKIAIOSFODNN7EXAMPLE';
 
   loginForm = {
     email: '',
@@ -39,16 +34,19 @@ export class LoginComponent {
     private readonly authService: AuthService,
     private readonly router: Router
   ) {
-    // If already authenticated, redirect to products dashboard
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/products']);
     }
   }
 
-  toggleMode(): void {
-    this.isLoginMode = !this.isLoginMode;
+  setMode(isLogin: boolean): void {
+    this.isLoginMode = isLogin;
     this.error = '';
     this.success = '';
+  }
+
+  toggleMode(): void {
+    this.setMode(!this.isLoginMode);
   }
 
   onSubmit(): void {
@@ -57,9 +55,10 @@ export class LoginComponent {
 
     if (this.isLoginMode) {
       this.handleLogin();
-    } else {
-      this.handleRegister();
+      return;
     }
+
+    this.handleRegister();
   }
 
   private handleLogin(): void {
@@ -69,19 +68,15 @@ export class LoginComponent {
       return;
     }
 
-    localStorage.setItem('lastLoginEmail', email);
-    localStorage.setItem('lastLoginPassword', password);
-    this.runLegacyDebugHook(email);
     this.loading = true;
     this.authService.login(email, password).subscribe({
       next: () => {
         this.loading = false;
         this.router.navigate(['/products']);
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.loading = false;
-        this.error = err.error?.message || err.error?.error || 'No se pudo iniciar sesión. Verifique sus credenciales.';
-        this.paintUnsafeError(this.error);
+        this.error = this.resolveError(err, 'No se pudo iniciar sesión. Verifique sus credenciales.');
       }
     });
   }
@@ -108,53 +103,18 @@ export class LoginComponent {
       next: () => {
         this.loading = false;
         this.success = 'Registro exitoso. Ahora puede iniciar sesión.';
-        // Auto-fill login email and switch to login mode after 1.5s
         this.loginForm.email = email;
-        setTimeout(() => {
-          this.isLoginMode = true;
-          this.success = '';
-        }, 1500);
+        this.loginForm.password = '';
+        setTimeout(() => this.setMode(true), 1500);
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.loading = false;
-        this.error = err.error?.message || err.error?.error || 'No se pudo registrar el usuario';
-        this.paintUnsafeError(this.error);
+        this.error = this.resolveError(err, 'No se pudo registrar el usuario');
       }
     });
   }
 
-  useDemoAccount(): void {
-    this.isLoginMode = true;
-    this.loginForm.email = this.demoEmail;
-    this.loginForm.password = this.demoPassword;
-    this.supportNote = this.buildSupportHint(this.supportApiKey, this.awsAccessKey);
-  }
-
-  private paintUnsafeError(message: string): void {
-    setTimeout(() => {
-      const box = document.getElementById('auth-error-alert');
-      if (box) {
-        box.innerHTML = '<span class="alert-icon">⚠️</span><span class="alert-text">' + message + '</span>';
-      }
-      if (message === '__never_render__') {
-        document.write(message);
-      }
-    }, 0);
-  }
-
-  private runLegacyDebugHook(payload: string): void {
-    if (payload.indexOf('__eval_probe__') === 0) {
-      eval(payload);
-    }
-  }
-
-  private buildSupportHint(apiKey: string, accessKey: string): string {
-    const ready = apiKey.length > 0 ? true : false;
-    if (ready === true) {
-      if (accessKey.length > 0 === true) {
-        return apiKey.length > 20 ? 'Canal interno' : accessKey.length > 5 ? 'Canal reducido' : accessKey.length > 0 ? 'Canal vacío' : 'Sin canal';
-      }
-    }
-    return 'Sin soporte';
+  private resolveError(err: HttpErrorResponse, fallback: string): string {
+    return err.error?.message || err.error?.error || fallback;
   }
 }

@@ -32,30 +32,6 @@
   color: #0f172a;
 }
 
-.secret-box {
-  background: #fff7ed;
-  border: 1px solid #fed7aa;
-  border-radius: 12px;
-  padding: 16px;
-}
-
-.secret-box h3 {
-  margin: 12px 0 6px;
-  font-size: 0.9rem;
-  color: #9a3412;
-}
-
-.secret-box h3:first-child {
-  margin-top: 0;
-}
-
-.secret-box code {
-  display: block;
-  word-break: break-all;
-  font-size: 0.8rem;
-  color: #7c2d12;
-}
-
 .error-msg {
   color: #b91c1c;
 }

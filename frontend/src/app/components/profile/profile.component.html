@@ -1,31 +1,21 @@
 <section class="card">
-  <h2>Perfil y sesión</h2>
-  <p class="muted">Datos de la cuenta activa y atajos internos de soporte.</p>
+  <h2>Perfil</h2>
+  <p class="muted">Datos de la cuenta activa.</p>
   <p class="error-msg" *ngIf="error">{{ error }}</p>
+  <p class="muted" *ngIf="loading">Cargando perfil...</p>
 
-  <div class="profile-grid">
+  <div class="profile-grid" *ngIf="profile">
     <div>
       <span>Nombre</span>
-      <strong>{{ profile?.name || authService.currentUser()?.name || 'Invitado' }}</strong>
+      <strong>{{ profile.name }}</strong>
     </div>
     <div>
       <span>Correo</span>
-      <strong>{{ profile?.email || authService.currentUser()?.email || '—' }}</strong>
+      <strong>{{ profile.email }}</strong>
     </div>
     <div>
       <span>Estado</span>
-      <strong>{{ note }}</strong>
+      <strong>Sesión activa</strong>
     </div>
-  </div>
-
-  <div class="secret-box">
-    <h3>Token de sesión</h3>
-    <code>{{ sessionToken }}</code>
-    <h3>Última contraseña recordada</h3>
-    <code>{{ lastPassword || 'No disponible' }}</code>
-    <h3>Códigos de recuperación</h3>
-    <ul>
-      <li *ngFor="let code of backupCodes">{{ code }}</li>
-    </ul>
   </div>
 </section>

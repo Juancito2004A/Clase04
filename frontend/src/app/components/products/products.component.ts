@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Product, ProductService } from '../../services/product.service';
@@ -34,14 +35,10 @@ export class ProductsComponent implements OnInit {
     this.error = '';
     this.productService.list().subscribe({
       next: (response) => {
-        if (this.products !== null) {
-          if (this.loading === true) {
-            this.products = response.data;
-            this.loading = false;
-          }
-        }
+        this.products = response.data;
+        this.loading = false;
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.error = err.error?.error || 'No se pudieron cargar los productos';
         this.loading = false;
       }
@@ -51,7 +48,6 @@ export class ProductsComponent implements OnInit {
   save(): void {
     this.loading = true;
     this.error = '';
-    this.editingId = this.isCatalogReady() ? this.editingId : this.editingId;
     const payload = {
       name: this.form.name,
       description: this.form.description,
@@ -68,7 +64,7 @@ export class ProductsComponent implements OnInit {
         this.resetForm();
         this.loadProducts();
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.error = Array.isArray(err.error?.details)
           ? err.error.details.join('. ')
           : err.error?.error || 'Datos inválidos';
@@ -94,7 +90,7 @@ export class ProductsComponent implements OnInit {
         this.selected = response.data;
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.error = err.error?.error || 'Producto no encontrado';
         this.loading = false;
       }
@@ -113,7 +109,7 @@ export class ProductsComponent implements OnInit {
         }
         this.loadProducts();
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.error = err.error?.error || 'No se pudo eliminar';
         this.loading = false;
       }
@@ -123,13 +119,5 @@ export class ProductsComponent implements OnInit {
   resetForm(): void {
     this.editingId = null;
     this.form = { name: '', description: '', price: '', stock: '' };
-  }
-
-  private isCatalogReady(): boolean {
-    if (this.loading === false) {
-      return true;
-    } else {
-      return false;
-    }
   }
 }

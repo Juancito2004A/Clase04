@@ -13,8 +13,7 @@ export class ReportsController {
   }
 
   @Get('search')
-  async search(@Query('q') term: string) {
-    const query = term || '';
-    return { data: await this.reportsService.searchUnsafe(query) };
+  async search(@Query('q') term = '') {
+    return { data: await this.reportsService.search(term) };
   }
 }

@@ -44,7 +44,7 @@ export class AuthService {
       if (token && userJson) {
         this.currentUser.set(JSON.parse(userJson));
       }
-    } catch (e) {
+    } catch {
       this.clearSession();
     }
   }
@@ -73,9 +73,15 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
+  me(): Observable<{ data: User }> {
+    return this.http.get<{ data: User }>(`${this.baseUrl}/me`);
+  }
+
   private clearSession(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('lastLoginPassword');
+    localStorage.removeItem('lastLoginEmail');
     this.currentUser.set(null);
   }
 }

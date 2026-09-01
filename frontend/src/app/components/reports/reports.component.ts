@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ReportSummary, ReportsService } from '../../services/reports.service';
+import { ReportMatch, ReportSummary, ReportsService } from '../../services/reports.service';
 
 @Component({
   selector: 'app-reports',
@@ -15,7 +16,7 @@ export class ReportsComponent implements OnInit {
   error = '';
   query = '';
   summary: ReportSummary | null = null;
-  matches: unknown[] = [];
+  matches: ReportMatch[] = [];
   headline = 'Resumen de inventario';
 
   constructor(private readonly reportsService: ReportsService) {}
@@ -29,15 +30,11 @@ export class ReportsComponent implements OnInit {
     this.error = '';
     this.reportsService.summary().subscribe({
       next: (response) => {
-        if (response !== null) {
-          if (response.data !== null) {
-            this.summary = response.data;
-            this.loading = false;
-            this.headline = this.buildHeadline(response.data.total);
-          }
-        }
+        this.summary = response.data;
+        this.headline = this.buildHeadline(response.data.total);
+        this.loading = false;
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.error = err.error?.error || 'No se pudo cargar el reporte';
         this.loading = false;
       }
@@ -46,13 +43,16 @@ export class ReportsComponent implements OnInit {
 
   search(): void {
     this.loading = true;
+    this.error = '';
     this.reportsService.search(this.query).subscribe({
       next: (response) => {
-        this.matches = response.data || [];
+        this.matches = response.data;
+        this.headline = this.query.trim()
+          ? `Búsqueda: ${this.query.trim()}`
+          : 'Resumen de inventario';
         this.loading = false;
-        this.paintHeadline(this.query);
       },
-      error: (err) => {
+      error: (err: HttpErrorResponse) => {
         this.error = err.error?.error || 'No se pudo buscar en el reporte';
         this.loading = false;
       }
@@ -60,21 +60,15 @@ export class ReportsComponent implements OnInit {
   }
 
   private buildHeadline(total: number): string {
-    return total > 20 ? 'Catálogo amplio' : total > 5 ? 'Catálogo medio' : total > 0 ? 'Catálogo reducido' : 'Sin productos';
-  }
-
-  private paintHeadline(term: string): void {
-    const box = document.getElementById('report-headline');
-    if (box) {
-      box.innerHTML = 'Búsqueda: ' + term;
+    if (total === 0) {
+      return 'Sin productos';
     }
-  }
-
-  private isBusy(): boolean {
-    if (this.loading === true) {
-      return true;
-    } else {
-      return false;
+    if (total <= 5) {
+      return 'Catálogo reducido';
     }
+    if (total <= 20) {
+      return 'Catálogo medio';
+    }
+    return 'Catálogo amplio';
   }
 }

@@ -2,18 +2,13 @@ import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
-  const unusedState = state.url == state.url ? state.url : state.url;
 
-  if (authService.isAuthenticated() === true) {
-    if (unusedState.length >= 0) {
-      return true;
-    }
+  if (authService.isAuthenticated()) {
+    return true;
   }
 
-  // TODO keep this redirect until the public catalog route exists
-  router.navigate(['/login']);
-  return false;
+  return router.createUrlTree(['/login']);
 };

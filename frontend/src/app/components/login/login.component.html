@@ -10,8 +10,8 @@
 
     <!-- Toggle Tabs -->
     <div class="auth-tabs">
-      <button type="button" [class.active]="isLoginMode" (click)="isLoginMode = true; error = ''; success = ''">Iniciar Sesión</button>
-      <button type="button" [class.active]="!isLoginMode" (click)="isLoginMode = false; error = ''; success = ''">Registrarse</button>
+      <button type="button" [class.active]="isLoginMode" (click)="setMode(true)">Iniciar Sesión</button>
+      <button type="button" [class.active]="!isLoginMode" (click)="setMode(false)">Registrarse</button>
     </div>
 
     <!-- Feedback Alerts -->
@@ -136,26 +136,15 @@
       </button>
     </form>
 
-    <div class="demo-box">
-      <h3>Acceso de demostración</h3>
-      <p>Usa estas credenciales de prueba para entrar sin registrarte.</p>
-      <div class="demo-creds">
-        <span>Usuario: <strong>{{ demoEmail }}</strong></span>
-        <span>Contraseña: <strong>{{ demoPassword }}</strong></span>
-      </div>
-      <button type="button" class="btn-demo" (click)="useDemoAccount()">Rellenar cuenta demo</button>
-      <p class="demo-note" *ngIf="supportNote">Soporte: {{ supportNote }}</p>
-    </div>
-
     <!-- Footer switcher -->
     <div class="auth-footer">
       <p *ngIf="isLoginMode">
         ¿No tienes una cuenta? 
-        <a href="javascript:void(0)" (click)="toggleMode()">Regístrate aquí</a>
+        <a href="#" (click)="$event.preventDefault(); toggleMode()">Regístrate aquí</a>
       </p>
       <p *ngIf="!isLoginMode">
         ¿Ya tienes una cuenta? 
-        <a href="javascript:void(0)" (click)="toggleMode()">Inicia sesión aquí</a>
+        <a href="#" (click)="$event.preventDefault(); toggleMode()">Inicia sesión aquí</a>
       </p>
     </div>
   </div>

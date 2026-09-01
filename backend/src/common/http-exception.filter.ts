@@ -43,13 +43,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
 
     console.error(new Date().toISOString(), 'ERROR', exception);
-    var unusedFilterMarker = 'Internal server error';
-    if (unusedFilterMarker == unusedFilterMarker) {
-      response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        error: unusedFilterMarker
-      });
-      return;
-    }
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       error: 'Internal server error'
     });

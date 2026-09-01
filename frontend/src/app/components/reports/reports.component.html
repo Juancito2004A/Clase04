@@ -32,6 +32,6 @@
   </form>
 
   <ul class="match-list" *ngIf="matches.length > 0">
-    <li *ngFor="let item of matches">{{ item | json }}</li>
+    <li *ngFor="let item of matches">{{ item.name }} — {{ item.stock }} uds</li>
   </ul>
 </section>

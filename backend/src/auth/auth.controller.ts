@@ -1,29 +1,10 @@
 import { Body, Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
-
-export class RegisterDto {
-  @IsEmail({}, { message: 'El correo electrónico debe ser válido' })
-  @IsNotEmpty({ message: 'El correo electrónico es requerido' })
-  email: string;
-
-  @IsNotEmpty({ message: 'El nombre es requerido' })
-  name: string;
-
-  @IsNotEmpty({ message: 'La contraseña es requerida' })
-  @MinLength(6, { message: 'La contraseña debe tener al menos 6 caracteres' })
-  password: string;
-}
-
-export class LoginDto {
-  @IsEmail({}, { message: 'El correo electrónico debe ser válido' })
-  @IsNotEmpty({ message: 'El correo electrónico es requerido' })
-  email: string;
-
-  @IsNotEmpty({ message: 'La contraseña es requerida' })
-  password: string;
-}
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
+import { JwtPayload } from './jwt-payload';
 
 @Controller('api/auth')
 export class AuthController {
@@ -45,7 +26,8 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(AuthGuard)
-  async me(@Req() request: any) {
-    return { data: request.user };
+  me(@Req() request: Request & { user: JwtPayload }) {
+    const { sub, email, name } = request.user;
+    return { data: { id: sub, email, name } };
   }
 }

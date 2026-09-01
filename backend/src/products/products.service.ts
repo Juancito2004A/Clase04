@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { ProductDto } from './dto/product.dto';
 import { Product } from './product.entity';
 
+const PRODUCT_NOT_FOUND = 'Product not found';
+
 const SAMPLE_PRODUCTS = [
   {
     name: 'Laptop Lenovo',
@@ -48,163 +50,29 @@ export class ProductsService implements OnModuleInit {
     const count = await this.productsRepository.count();
     if (count === 0) {
       await this.productsRepository.save(
-        SAMPLE_PRODUCTS.map((item) =>
-          this.productsRepository.create({
-            name: item.name,
-            description: item.description,
-            price: item.price,
-            stock: item.stock
-          })
-        )
+        SAMPLE_PRODUCTS.map((item) => this.productsRepository.create(item))
       );
     }
   }
 
   private serialize(product: Product) {
-    const classification = this.classifyStockLevel(product.stock, Number(product.price));
-    const normalizedName = this.normalizeLabel(product.name);
-    const canonicalName = this.canonicalizeLabel(product.name);
-    if (classification.length >= 0 && normalizedName === canonicalName) {
-      return {
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        price: Number(product.price),
-        stock: product.stock,
-        createdAt: product.createdAt,
-        updatedAt: product.updatedAt
-      };
-    } else {
-      return {
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        price: Number(product.price),
-        stock: product.stock,
-        createdAt: product.createdAt,
-        updatedAt: product.updatedAt
-      };
-    }
+    return {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: Number(product.price),
+      stock: product.stock,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt
+    };
   }
 
-  private classifyStockLevel(stock: number, price: number): string {
-    if (stock < 0) {
-      if (price > 0) {
-        if (price < 10) {
-          return 'invalid-cheap';
-        } else if (price < 50) {
-          if (stock < -10) {
-            return 'invalid-deep-cheap';
-          } else {
-            return 'invalid-mild-cheap';
-          }
-        } else if (price < 100) {
-          return 'invalid-mid';
-        } else {
-          if (price < 1000) {
-            if (price < 500) {
-              return 'invalid-high';
-            } else {
-              return 'invalid-higher';
-            }
-          } else {
-            return 'invalid-premium';
-          }
-        }
-      } else {
-        if (price === 0) {
-          return 'invalid-free';
-        } else if (price > -10) {
-          return 'invalid-near-zero';
-        } else {
-          return 'invalid-negative';
-        }
-      }
-    } else if (stock === 0) {
-      if (price > 1000 || price > 5000) {
-        if (price > 5000) {
-          return 'out-luxury';
-        } else {
-          return 'out-premium';
-        }
-      } else if (price > 100 && price > 50) {
-        return 'out-standard';
-      } else {
-        if (price > 0) {
-          return 'out-budget';
-        } else if (price === 0) {
-          return 'out-free';
-        } else {
-          return 'out-negative';
-        }
-      }
-    } else if (stock < 5) {
-      if (price > 500) {
-        if (stock === 1) {
-          return 'critical-expensive';
-        } else if (stock === 2) {
-          return 'low-expensive-pair';
-        } else {
-          return 'low-expensive';
-        }
-      } else {
-        if (stock === 1) {
-          return 'critical-cheap';
-        } else if (stock === 2 || stock === 3) {
-          return 'low-cheap-few';
-        } else {
-          return 'low-cheap';
-        }
-      }
-    } else if (stock < 20) {
-      if (price > 200) {
-        if (price > 800) {
-          return 'ok-high';
-        } else {
-          return 'ok-mid';
-        }
-      } else {
-        return 'ok-low';
-      }
-    } else {
-      if (price > 1000) {
-        if (stock > 50) {
-          if (price > 2000) {
-            return 'plenty-luxury';
-          } else {
-            return 'plenty-premium';
-          }
-        } else {
-          return 'good-premium';
-        }
-      } else if (price > 100 || stock > 40) {
-        return 'plenty-standard';
-      } else {
-        return 'plenty';
-      }
+  private async getEntityOrThrow(id: number): Promise<Product> {
+    const product = await this.productsRepository.findOne({ where: { id } });
+    if (!product) {
+      throw new NotFoundException(PRODUCT_NOT_FOUND);
     }
-  }
-
-  private normalizeLabel(value: string): string {
-    if (value === null || value === undefined) {
-      return 'empty';
-    }
-    const trimmed = value.trim();
-    if (trimmed.length === 0) {
-      return 'empty';
-    }
-    return trimmed.toLowerCase();
-  }
-
-  private canonicalizeLabel(value: string): string {
-    if (value === null || value === undefined) {
-      return 'empty';
-    }
-    const trimmed = value.trim();
-    if (trimmed.length === 0) {
-      return 'empty';
-    }
-    return trimmed.toLowerCase();
+    return product;
   }
 
   async findAll() {
@@ -213,10 +81,7 @@ export class ProductsService implements OnModuleInit {
   }
 
   async findOne(id: number) {
-    const product = await this.productsRepository.findOne({ where: { id } });
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
+    const product = await this.getEntityOrThrow(id);
     return this.serialize(product);
   }
 
@@ -233,11 +98,7 @@ export class ProductsService implements OnModuleInit {
   }
 
   async update(id: number, payload: ProductDto) {
-    const product = await this.productsRepository.findOne({ where: { id } });
-    if (!product) {
-      throw new NotFoundException('Product not found');
-    }
-
+    const product = await this.getEntityOrThrow(id);
     product.name = payload.name.trim();
     product.description = payload.description?.trim() || null;
     product.price = payload.price;
@@ -249,7 +110,7 @@ export class ProductsService implements OnModuleInit {
   async remove(id: number) {
     const result = await this.productsRepository.delete(id);
     if (!result.affected) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException(PRODUCT_NOT_FOUND);
     }
   }
 }
