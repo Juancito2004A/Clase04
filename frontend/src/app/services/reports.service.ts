@@ -2,22 +2,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { ReportMatch, ReportSummary } from '../models/report.model';
 
-export type StockStatus = 'out' | 'low' | 'ok';
-
-export interface ReportSummary {
-  total: number;
-  lowStock: number;
-  outOfStock: number;
-  inventoryValue: number;
-  statuses: StockStatus[];
-}
-
-export interface ReportMatch {
-  id: number;
-  name: string;
-  stock: number;
-}
+export type { ReportMatch, ReportSummary, StockStatus } from '../models/report.model';
 
 @Injectable({ providedIn: 'root' })
 export class ReportsService {

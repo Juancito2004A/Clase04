@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ReportMatch, ReportSummary, ReportsService } from '../../services/reports.service';
+import { resolveHttpError } from '../../utils/http-error';
 
 @Component({
   selector: 'app-reports',
@@ -35,7 +36,7 @@ export class ReportsComponent implements OnInit {
         this.loading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.error = err.error?.error || 'No se pudo cargar el reporte';
+        this.error = resolveHttpError(err, 'No se pudo cargar el reporte');
         this.loading = false;
       }
     });
@@ -53,7 +54,7 @@ export class ReportsComponent implements OnInit {
         this.loading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.error = err.error?.error || 'No se pudo buscar en el reporte';
+        this.error = resolveHttpError(err, 'No se pudo buscar en el reporte');
         this.loading = false;
       }
     });

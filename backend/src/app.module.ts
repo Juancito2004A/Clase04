@@ -10,6 +10,7 @@ import { User } from './users/user.entity';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ReportsModule } from './reports/reports.module';
+import { getDatabaseConfig } from './config/env';
 
 @Module({
   imports: [
@@ -20,14 +21,8 @@ import { ReportsModule } from './reports/reports.module';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get('DB_HOST', 'localhost'),
-        port: Number(config.get('DB_PORT', 5433)),
-        username: config.get('DB_USER', 'products_user'),
-        password: config.get('DB_PASSWORD', 'products_pass'),
-        database: config.get('DB_NAME', 'products_db'),
-        entities: [Product, User],
-        synchronize: true
+        ...getDatabaseConfig(config),
+        entities: [Product, User]
       })
     }),
     ProductsModule,

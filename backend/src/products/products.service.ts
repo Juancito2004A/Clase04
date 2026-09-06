@@ -6,6 +6,16 @@ import { Product } from './product.entity';
 
 const PRODUCT_NOT_FOUND = 'Product not found';
 
+export interface ProductResponse {
+  id: number;
+  name: string;
+  description: string | null;
+  price: number;
+  stock: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 const SAMPLE_PRODUCTS = [
   {
     name: 'Laptop Lenovo',
@@ -55,16 +65,41 @@ export class ProductsService implements OnModuleInit {
     }
   }
 
-  private serialize(product: Product) {
-    return {
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      price: Number(product.price),
-      stock: product.stock,
-      createdAt: product.createdAt,
-      updatedAt: product.updatedAt
-    };
+  async findAll(): Promise<ProductResponse[]> {
+    const products = await this.productsRepository.find({ order: { id: 'ASC' } });
+    return products.map((product) => this.serialize(product));
+  }
+
+  async findOne(id: number): Promise<ProductResponse> {
+    return this.serialize(await this.getEntityOrThrow(id));
+  }
+
+  async create(payload: ProductDto): Promise<ProductResponse> {
+    const product = this.productsRepository.create();
+    this.applyPayload(product, payload);
+    const saved = await this.productsRepository.save(product);
+    return this.serialize(saved);
+  }
+
+  async update(id: number, payload: ProductDto): Promise<ProductResponse> {
+    const product = await this.getEntityOrThrow(id);
+    this.applyPayload(product, payload);
+    const saved = await this.productsRepository.save(product);
+    return this.serialize(saved);
+  }
+
+  async remove(id: number): Promise<void> {
+    const result = await this.productsRepository.delete(id);
+    if (!result.affected) {
+      throw new NotFoundException(PRODUCT_NOT_FOUND);
+    }
+  }
+
+  private applyPayload(product: Product, payload: ProductDto): void {
+    product.name = payload.name.trim();
+    product.description = payload.description?.trim() || null;
+    product.price = payload.price;
+    product.stock = payload.stock;
   }
 
   private async getEntityOrThrow(id: number): Promise<Product> {
@@ -75,42 +110,15 @@ export class ProductsService implements OnModuleInit {
     return product;
   }
 
-  async findAll() {
-    const products = await this.productsRepository.find({ order: { id: 'ASC' } });
-    return products.map((product) => this.serialize(product));
-  }
-
-  async findOne(id: number) {
-    const product = await this.getEntityOrThrow(id);
-    return this.serialize(product);
-  }
-
-  async create(payload: ProductDto) {
-    const product = await this.productsRepository.save(
-      this.productsRepository.create({
-        name: payload.name.trim(),
-        description: payload.description?.trim() || null,
-        price: payload.price,
-        stock: payload.stock
-      })
-    );
-    return this.serialize(product);
-  }
-
-  async update(id: number, payload: ProductDto) {
-    const product = await this.getEntityOrThrow(id);
-    product.name = payload.name.trim();
-    product.description = payload.description?.trim() || null;
-    product.price = payload.price;
-    product.stock = payload.stock;
-    const saved = await this.productsRepository.save(product);
-    return this.serialize(saved);
-  }
-
-  async remove(id: number) {
-    const result = await this.productsRepository.delete(id);
-    if (!result.affected) {
-      throw new NotFoundException(PRODUCT_NOT_FOUND);
-    }
+  private serialize(product: Product): ProductResponse {
+    return {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: Number(product.price),
+      stock: product.stock,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt
+    };
   }
 }

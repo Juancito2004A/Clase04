@@ -1,12 +1,17 @@
 import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
+interface HealthResponse {
+  status: 'ok' | 'error';
+  database: 'connected' | 'disconnected';
+}
+
 @Controller('health')
 export class HealthController {
   constructor(private readonly dataSource: DataSource) {}
 
   @Get()
-  async health() {
+  async health(): Promise<HealthResponse> {
     try {
       await this.dataSource.query('SELECT 1');
       return {

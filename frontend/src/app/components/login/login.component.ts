@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { resolveHttpError } from '../../utils/http-error';
 
 @Component({
   selector: 'app-login',
@@ -76,7 +77,7 @@ export class LoginComponent {
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;
-        this.error = this.resolveError(err, 'No se pudo iniciar sesión. Verifique sus credenciales.');
+        this.error = resolveHttpError(err, 'No se pudo iniciar sesión. Verifique sus credenciales.');
       }
     });
   }
@@ -109,12 +110,9 @@ export class LoginComponent {
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;
-        this.error = this.resolveError(err, 'No se pudo registrar el usuario');
+        this.error = resolveHttpError(err, 'No se pudo registrar el usuario');
       }
     });
   }
 
-  private resolveError(err: HttpErrorResponse, fallback: string): string {
-    return err.error?.message || err.error?.error || fallback;
-  }
 }

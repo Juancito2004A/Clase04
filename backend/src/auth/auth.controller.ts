@@ -1,7 +1,7 @@
-import { Body, Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
-import { Request } from 'express';
+import { Body, Controller, Get, HttpCode, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
+import { CurrentUser } from './decorators/current-user.decorator';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtPayload } from './jwt-payload';
@@ -13,21 +13,18 @@ export class AuthController {
   @Post('register')
   @HttpCode(201)
   async register(@Body() payload: RegisterDto) {
-    const data = await this.authService.register(payload.email, payload.name, payload.password);
-    return { data };
+    return { data: await this.authService.register(payload.email, payload.name, payload.password) };
   }
 
   @Post('login')
   @HttpCode(200)
   async login(@Body() payload: LoginDto) {
-    const data = await this.authService.login(payload.email, payload.password);
-    return { data };
+    return { data: await this.authService.login(payload.email, payload.password) };
   }
 
   @Get('me')
   @UseGuards(AuthGuard)
-  me(@Req() request: Request & { user: JwtPayload }) {
-    const { sub, email, name } = request.user;
-    return { data: { id: sub, email, name } };
+  me(@CurrentUser() user: JwtPayload) {
+    return { data: this.authService.toPublicUser({ id: user.sub, email: user.email, name: user.name }) };
   }
 }

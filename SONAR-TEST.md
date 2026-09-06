@@ -1,11 +1,10 @@
-# Limpieza de calidad — Clase04
+# Baseline limpio para Zyrion
 
-Las malas prácticas introducidas para la prueba de Zyrion/SonarScanner fueron **eliminadas**.
+Este repositorio quedó refactorizado para nuevas pruebas de calidad y seguridad.
 
-El código actual debe analizarse como una aplicación Angular + NestJS con:
-- autenticación JWT + bcrypt
-- CRUD de productos
-- reportes de inventario con consultas parametrizadas
-- perfil de usuario sin exposición de secretos
+- Angular 19 + NestJS, CRUD de productos, login JWT, reportes y perfil.
+- Secretos de JWT y base de datos salen de variables de entorno, no del código.
+- Consultas parametrizadas, contraseñas con bcrypt, hash de usuario no expuesto en SELECT por defecto.
+- Frontend con modelos compartidos y un único helper de errores HTTP.
 
-No quedan módulos `legacy-quality`, backdoors, `eval`, SQL concatenado ni credenciales hardcodeadas de demo.
+El análisis de Zyrion (SonarScanner / Semgrep) debe correr sobre este árbol, no sobre findings fabricados.

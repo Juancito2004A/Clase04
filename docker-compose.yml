@@ -23,6 +23,8 @@ services:
     restart: unless-stopped
     environment:
       PORT: 3011
+      JWT_SECRET: ${JWT_SECRET:-replace-with-a-long-random-value}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost:3010}
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: ${DB_NAME:-products_db}

@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Product, ProductService } from '../../services/product.service';
+import { resolveHttpError } from '../../utils/http-error';
 
 @Component({
   selector: 'app-products',
@@ -39,7 +40,7 @@ export class ProductsComponent implements OnInit {
         this.loading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.error = err.error?.error || 'No se pudieron cargar los productos';
+        this.error = resolveHttpError(err, 'No se pudieron cargar los productos');
         this.loading = false;
       }
     });
@@ -65,9 +66,7 @@ export class ProductsComponent implements OnInit {
         this.loadProducts();
       },
       error: (err: HttpErrorResponse) => {
-        this.error = Array.isArray(err.error?.details)
-          ? err.error.details.join('. ')
-          : err.error?.error || 'Datos inválidos';
+        this.error = resolveHttpError(err, 'Datos inválidos');
         this.loading = false;
       }
     });
@@ -91,7 +90,7 @@ export class ProductsComponent implements OnInit {
         this.loading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.error = err.error?.error || 'Producto no encontrado';
+        this.error = resolveHttpError(err, 'Producto no encontrado');
         this.loading = false;
       }
     });
@@ -110,7 +109,7 @@ export class ProductsComponent implements OnInit {
         this.loadProducts();
       },
       error: (err: HttpErrorResponse) => {
-        this.error = err.error?.error || 'No se pudo eliminar';
+        this.error = resolveHttpError(err, 'No se pudo eliminar');
         this.loading = false;
       }
     });

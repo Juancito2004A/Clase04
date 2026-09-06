@@ -5,6 +5,7 @@ import { UsersModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
+import { getJwtSecret } from '../config/env';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { AuthGuard } from './auth.guard';
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET', 'super-secret-jwt-key-change-me-in-production'),
+        secret: getJwtSecret(config),
         signOptions: { expiresIn: '1d' }
       })
     })

@@ -7,6 +7,20 @@ const LOW_STOCK_THRESHOLD = 5;
 
 export type StockStatus = 'out' | 'low' | 'ok';
 
+export interface ReportSummary {
+  total: number;
+  lowStock: number;
+  outOfStock: number;
+  inventoryValue: number;
+  statuses: StockStatus[];
+}
+
+export interface ReportMatch {
+  id: number;
+  name: string;
+  stock: number;
+}
+
 @Injectable()
 export class ReportsService {
   constructor(
@@ -14,7 +28,7 @@ export class ReportsService {
     private readonly productsRepository: Repository<Product>
   ) {}
 
-  async summary() {
+  async summary(): Promise<ReportSummary> {
     const products = await this.productsRepository.find({ order: { id: 'ASC' } });
 
     return {
@@ -26,7 +40,7 @@ export class ReportsService {
     };
   }
 
-  async search(term: string) {
+  async search(term: string): Promise<ReportMatch[]> {
     const query = term.trim();
     if (!query) {
       return [];
