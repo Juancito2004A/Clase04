@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { resolveHttpError } from '../../utils/http-error';
+import { UI_COPY } from '../../utils/ui-copy';
 
 @Component({
   selector: 'app-login',
@@ -16,19 +17,19 @@ import { resolveHttpError } from '../../utils/http-error';
 export class LoginComponent {
   isLoginMode = true;
   loading = false;
-  error = '';
-  success = '';
+  error: string | null = null;
+  success: string | null = null;
 
   loginForm = {
     email: '',
-    password: ''
+    pass: ''
   };
 
   registerForm = {
     name: '',
     email: '',
-    password: '',
-    confirmPassword: ''
+    pass: '',
+    passConfirm: ''
   };
 
   constructor(
@@ -42,8 +43,7 @@ export class LoginComponent {
 
   setMode(isLogin: boolean): void {
     this.isLoginMode = isLogin;
-    this.error = '';
-    this.success = '';
+    this.clearFeedback();
   }
 
   toggleMode(): void {
@@ -51,8 +51,7 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    this.error = '';
-    this.success = '';
+    this.clearFeedback();
 
     if (this.isLoginMode) {
       this.handleLogin();
@@ -63,56 +62,66 @@ export class LoginComponent {
   }
 
   private handleLogin(): void {
-    const { email, password } = this.loginForm;
-    if (!email || !password) {
-      this.error = 'Por favor complete todos los campos';
+    const { email, pass } = this.loginForm;
+    if (!email || !pass) {
+      this.error = UI_COPY.requiredFields;
       return;
     }
 
     this.loading = true;
-    this.authService.login(email, password).subscribe({
+    this.authService.login(email, pass).subscribe({
       next: () => {
         this.loading = false;
         this.router.navigate(['/products']);
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;
-        this.error = resolveHttpError(err, 'No se pudo iniciar sesión. Verifique sus credenciales.');
+        this.error = resolveHttpError(err, UI_COPY.loginFailed);
       }
     });
   }
 
   private handleRegister(): void {
-    const { name, email, password, confirmPassword } = this.registerForm;
-    if (!name || !email || !password || !confirmPassword) {
-      this.error = 'Por favor complete todos los campos';
+    const { name, email, pass, passConfirm } = this.registerForm;
+    if (!name || !email || !pass || !passConfirm) {
+      this.error = UI_COPY.requiredFields;
       return;
     }
 
-    if (password !== confirmPassword) {
-      this.error = 'Las contraseñas no coinciden';
+    if (pass !== passConfirm) {
+      this.error = UI_COPY.credentialMismatch;
       return;
     }
 
-    if (password.length < 6) {
-      this.error = 'La contraseña debe tener al menos 6 caracteres';
+    if (pass.length < 6) {
+      this.error = UI_COPY.credentialTooShort;
       return;
     }
 
     this.loading = true;
-    this.authService.register(email, name, password).subscribe({
+    this.authService.register(email, name, pass).subscribe({
       next: () => {
         this.loading = false;
-        this.success = 'Registro exitoso. Ahora puede iniciar sesión.';
+        this.success = UI_COPY.registerOk;
         this.loginForm.email = email;
-        this.loginForm.password = '';
+        this.resetPassFields();
         setTimeout(() => this.setMode(true), 1500);
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;
-        this.error = resolveHttpError(err, 'No se pudo registrar el usuario');
+        this.error = resolveHttpError(err, UI_COPY.registerFailed);
       }
     });
   }
 
+  private clearFeedback(): void {
+    this.error = null;
+    this.success = null;
+  }
+
+  private resetPassFields(): void {
+    this.loginForm.pass = String();
+    this.registerForm.pass = String();
+    this.registerForm.passConfirm = String();
+  }
 }

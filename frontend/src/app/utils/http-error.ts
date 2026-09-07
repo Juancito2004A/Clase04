@@ -6,5 +6,5 @@ export function resolveHttpError(error: HttpErrorResponse, fallback: string): st
     return details.join('. ');
   }
 
-  return error.error?.message || error.error?.error || fallback;
+  return error.error?.message ?? error.error?.error ?? fallback;
 }

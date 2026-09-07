@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { User } from '../../models/user.model';
 import { AuthService } from '../../services/auth.service';
 import { resolveHttpError } from '../../utils/http-error';
+import { UI_COPY } from '../../utils/ui-copy';
 
 @Component({
   selector: 'app-profile',
@@ -14,7 +15,7 @@ import { resolveHttpError } from '../../utils/http-error';
 })
 export class ProfileComponent implements OnInit {
   profile: User | null = null;
-  error = '';
+  error: string | null = null;
   loading = false;
 
   constructor(public readonly authService: AuthService) {}
@@ -28,7 +29,7 @@ export class ProfileComponent implements OnInit {
         this.loading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.error = resolveHttpError(err, 'No se pudo cargar el perfil');
+        this.error = resolveHttpError(err, UI_COPY.profileLoadFailed);
         this.loading = false;
       }
     });

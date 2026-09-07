@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Product, ProductService } from '../../services/product.service';
 import { resolveHttpError } from '../../utils/http-error';
+import { UI_COPY } from '../../utils/ui-copy';
 
 @Component({
   selector: 'app-products',
@@ -17,7 +18,7 @@ export class ProductsComponent implements OnInit {
   selected: Product | null = null;
   editingId: number | null = null;
   loading = false;
-  error = '';
+  error: string | null = null;
   form = {
     name: '',
     description: '',
@@ -33,14 +34,14 @@ export class ProductsComponent implements OnInit {
 
   loadProducts(): void {
     this.loading = true;
-    this.error = '';
+    this.error = null;
     this.productService.list().subscribe({
       next: (response) => {
         this.products = response.data;
         this.loading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.error = resolveHttpError(err, 'No se pudieron cargar los productos');
+        this.error = resolveHttpError(err, UI_COPY.productsLoadFailed);
         this.loading = false;
       }
     });
@@ -48,7 +49,7 @@ export class ProductsComponent implements OnInit {
 
   save(): void {
     this.loading = true;
-    this.error = '';
+    this.error = null;
     const payload = {
       name: this.form.name,
       description: this.form.description,
@@ -66,7 +67,7 @@ export class ProductsComponent implements OnInit {
         this.loadProducts();
       },
       error: (err: HttpErrorResponse) => {
-        this.error = resolveHttpError(err, 'Datos inválidos');
+        this.error = resolveHttpError(err, UI_COPY.productsInvalid);
         this.loading = false;
       }
     });
@@ -76,7 +77,7 @@ export class ProductsComponent implements OnInit {
     this.editingId = product.id;
     this.form = {
       name: product.name,
-      description: product.description || '',
+      description: product.description ?? '',
       price: String(product.price),
       stock: String(product.stock)
     };
@@ -90,7 +91,7 @@ export class ProductsComponent implements OnInit {
         this.loading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.error = resolveHttpError(err, 'Producto no encontrado');
+        this.error = resolveHttpError(err, UI_COPY.productMissing);
         this.loading = false;
       }
     });
@@ -109,7 +110,7 @@ export class ProductsComponent implements OnInit {
         this.loadProducts();
       },
       error: (err: HttpErrorResponse) => {
-        this.error = resolveHttpError(err, 'No se pudo eliminar');
+        this.error = resolveHttpError(err, UI_COPY.productDeleteFailed);
         this.loading = false;
       }
     });

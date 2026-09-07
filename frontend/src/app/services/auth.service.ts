@@ -6,8 +6,8 @@ import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthResponse, RegisterResponse, User } from '../models/user.model';
 
-const TOKEN_KEY = 'token';
-const USER_KEY = 'user';
+const SESSION_ID_STORAGE = 'session.id';
+const SESSION_PROFILE_STORAGE = 'session.profile';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -43,19 +43,19 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem(SESSION_ID_STORAGE);
   }
 
   private persistSession(token: string, user: User): void {
-    localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    localStorage.setItem(SESSION_ID_STORAGE, token);
+    localStorage.setItem(SESSION_PROFILE_STORAGE, JSON.stringify(user));
     this.currentUser.set(user);
   }
 
   private loadSession(): void {
     try {
-      const token = localStorage.getItem(TOKEN_KEY);
-      const userJson = localStorage.getItem(USER_KEY);
+      const token = localStorage.getItem(SESSION_ID_STORAGE);
+      const userJson = localStorage.getItem(SESSION_PROFILE_STORAGE);
       if (token && userJson) {
         this.currentUser.set(JSON.parse(userJson) as User);
       }
@@ -65,8 +65,10 @@ export class AuthService {
   }
 
   private clearSession(): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(SESSION_ID_STORAGE);
+    localStorage.removeItem(SESSION_PROFILE_STORAGE);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     this.currentUser.set(null);
   }
 }

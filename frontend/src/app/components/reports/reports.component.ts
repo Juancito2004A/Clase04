@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ReportMatch, ReportSummary, ReportsService } from '../../services/reports.service';
 import { resolveHttpError } from '../../utils/http-error';
+import { UI_COPY } from '../../utils/ui-copy';
 
 @Component({
   selector: 'app-reports',
@@ -14,11 +15,11 @@ import { resolveHttpError } from '../../utils/http-error';
 })
 export class ReportsComponent implements OnInit {
   loading = false;
-  error = '';
-  query = '';
+  error: string | null = null;
+  query = String();
   summary: ReportSummary | null = null;
   matches: ReportMatch[] = [];
-  headline = 'Resumen de inventario';
+  headline: string = UI_COPY.inventoryHeadline;
 
   constructor(private readonly reportsService: ReportsService) {}
 
@@ -28,7 +29,7 @@ export class ReportsComponent implements OnInit {
 
   loadSummary(): void {
     this.loading = true;
-    this.error = '';
+    this.error = null;
     this.reportsService.summary().subscribe({
       next: (response) => {
         this.summary = response.data;
@@ -36,7 +37,7 @@ export class ReportsComponent implements OnInit {
         this.loading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.error = resolveHttpError(err, 'No se pudo cargar el reporte');
+        this.error = resolveHttpError(err, UI_COPY.reportLoadFailed);
         this.loading = false;
       }
     });
@@ -44,17 +45,17 @@ export class ReportsComponent implements OnInit {
 
   search(): void {
     this.loading = true;
-    this.error = '';
+    this.error = null;
     this.reportsService.search(this.query).subscribe({
       next: (response) => {
         this.matches = response.data;
         this.headline = this.query.trim()
           ? `Búsqueda: ${this.query.trim()}`
-          : 'Resumen de inventario';
+          : UI_COPY.inventoryHeadline;
         this.loading = false;
       },
       error: (err: HttpErrorResponse) => {
-        this.error = resolveHttpError(err, 'No se pudo buscar en el reporte');
+        this.error = resolveHttpError(err, UI_COPY.reportSearchFailed);
         this.loading = false;
       }
     });

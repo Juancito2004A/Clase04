@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { ProductDto } from './dto/product.dto';
 import { Product } from './product.entity';
 
-const PRODUCT_NOT_FOUND = 'Product not found';
+const MISSING_PRODUCT_MESSAGE = 'Product not found';
 
 export interface ProductResponse {
   id: number;
@@ -91,13 +91,14 @@ export class ProductsService implements OnModuleInit {
   async remove(id: number): Promise<void> {
     const result = await this.productsRepository.delete(id);
     if (!result.affected) {
-      throw new NotFoundException(PRODUCT_NOT_FOUND);
+      throw new NotFoundException(MISSING_PRODUCT_MESSAGE);
     }
   }
 
   private applyPayload(product: Product, payload: ProductDto): void {
     product.name = payload.name.trim();
-    product.description = payload.description?.trim() || null;
+    const trimmedDescription = payload.description?.trim();
+    product.description = trimmedDescription ? trimmedDescription : null;
     product.price = payload.price;
     product.stock = payload.stock;
   }
@@ -105,7 +106,7 @@ export class ProductsService implements OnModuleInit {
   private async getEntityOrThrow(id: number): Promise<Product> {
     const product = await this.productsRepository.findOne({ where: { id } });
     if (!product) {
-      throw new NotFoundException(PRODUCT_NOT_FOUND);
+      throw new NotFoundException(MISSING_PRODUCT_MESSAGE);
     }
     return product;
   }
